@@ -1,0 +1,30 @@
+# 编译产物（可执行文件）
+*.exe
+*.out
+*.app
+
+# 目标文件
+*.o
+*.obj
+*.a
+*.lib
+
+# 调试文件
+*.pdb
+*.dSYM
+*.suo
+*.user
+
+# IDE 配置文件（VS Code）
+.vscode/
+.idea/
+
+# 临时文件
+*.tmp
+*.log
+*.swp
+*.bak
+
+# 如果用了 CMake
+build/
+cmake-build-*/
