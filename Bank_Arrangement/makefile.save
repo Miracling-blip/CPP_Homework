@@ -1,0 +1,3 @@
+main.o:main.C BankUI.h
+	g++ -g main.C BankUI.h -o main.o
+BankUI.o:
