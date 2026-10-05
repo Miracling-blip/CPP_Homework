@@ -19,6 +19,10 @@
 .vscode/
 .idea/
 
+# 系统垃圾
+Thumbs.db
+Desktop.ini
+
 # 临时文件
 *.tmp
 *.log
