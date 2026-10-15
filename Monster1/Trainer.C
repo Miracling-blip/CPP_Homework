@@ -1,7 +1,7 @@
-#include"Trainer.hpp"
+#include"Trainer.h"
 #include<iostream>
-#include"Monster.hpp"
-#include"Team.hpp"
+#include"Monster.h"
+#include"Team.h"
 #include<cstdlib>
 
 Trainer::Trainer(int id = 0):trainerID(id) {}
@@ -24,7 +24,7 @@ double getAveragePower()
 	double averagePower = myTeam.getTotalPower() / myTeam.getCount();
 }
 
-Trainer& Trainer::operator=(Trainer& t)
+Trainer::Trainer& operator=(Trainer& t)
 {
 	trainerID(t.trainerID);
 	myTeam = t.myTeam;
@@ -37,21 +37,22 @@ ostream& operator<<(ostream& os, Trainer& t)
 	return os;
 }
 
-Trainer& Trainer::operator+(Trainer& t1, Trainer& t2)
+Trainer::Trainer& operator+(Trainer& t1, Trainer& t2)
 {
 	trainerID = t1.trainerID + t2.trainerID;
 	myTeam = t1.myTeam + t2.myTeam;
 	return *this;
 }
 
-Monster* Trainer::operator[](int index)
+Trainer::Monster* operator[](int index)
 {
 	return myTeam.get(index);
 }
 
-Trainer& Trainer::operator++()
+Trainer::Trainer& operator++()
 {
-	Monster m(rand(), rand(), rand());
-    myTeam.add(m);
-    return *this;
+	srand(100);
+	static Monster m(rand(), rand(), rand());
+        myTeam.add(m);
+        return *this;
 }

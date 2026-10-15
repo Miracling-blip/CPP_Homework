@@ -3,12 +3,11 @@
 class Monster
 {
 private:
-	int speciesID, hp, level;
+	int speciesId, hp, level;
 public:
 	Monster(int,int,int);
 	int power();
 	int getHp() return hp;
 	int getLevel() return level;
 	int getSpeciesId() return speciesId;
-	void push(const Monster& m);
 };

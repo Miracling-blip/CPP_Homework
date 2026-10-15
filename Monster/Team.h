@@ -11,9 +11,13 @@ public:
 	~Team();
 	void add(const Monster&);
 	void release(int);
-	int getCount() return count;
-	int getTotalPower();
+	int getCount() const
+	{
+		return count;
+	}
+	int getTotalPower() const;
 	Monster* get(int i);
-	Team& operator=(Team&);
-	Team& operator+(Team&,Team&)
-}
+	Team& operator=(const Team&);
+	Team operator+(const Team&);
+	void merge(const Team& a, const Team& b);
+};
