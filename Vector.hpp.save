@@ -1,5 +1,0 @@
-#ifndef _Vector_H_
-#define _VECTOR_H_
-#include    "C_Cpp.intelliSenseEngine": "disabled",
-    "C_Cpp.autocomplete": "disabled",
-    "C_Cpp.errorSquiggles": "disabled"

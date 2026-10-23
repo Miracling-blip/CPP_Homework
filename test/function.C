@@ -1,15 +1,18 @@
-#include <iostream>
+#include<iostream>
 using namespace std;
-int main()
-{
-    int a[10];
-    a[1] = 100; // 100 to the second element
-    a[9] = 101; // 101 to the last element
-    int i=1, j=2;
-    a[i+j] = 10; // 10 to the 4th element      
-    a[i+j] += 2; // add 2 to the 4th element,    
-    a[i] = a[i+1] = 1;
-    a[i++] = 2;
-    if (a[1] > a[2]) a[1] = a[2]; 
-    return 0;
+class A {
+    int x;
+public:
+    A() {cout << "C1" << endl;}
+    A(int y) : x(y) {cout << "C2" << endl;}
+    A(const A& a): x(a.x) {cout << "C3" << endl;}
+    A& operator=(const A& a) {cout << "=" << endl; return *this;}
+    ~A() {cout << "D" << endl;}
+};
+
+A f1(A a) {return a;}
+
+int main() {
+    A a;
+    a = f1(a);
 }

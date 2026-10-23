@@ -90,7 +90,7 @@ Team Team::operator+(const Team& t)
 	Team tmpTeam;
 	tmpTeam.capacity = this->capacity + t.capacity;
 	tmpTeam.count = this->count + t.count;
-	tmpTeam.len = tmpTeam.count;
+	tmpTeam.len = this->len + t.len;
 	tmpTeam.merge(*this, t);
 	return tmpTeam;
 }
