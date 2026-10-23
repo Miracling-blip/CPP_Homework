@@ -1,10 +1,8 @@
 #include<stdexcept>
 #include<iostream>
-#include "Vector.hpp"
-using namespace std;
 
 template<typename T>
-Vector<T>::Vector(Vector& other)
+Vector<T>::Vector(Vector<T>& other)
 {
 	size = other.size;
 	p = new T[size];
@@ -70,7 +68,8 @@ void Vector<T>::show()
 	cout << endl;
 }
 
-Vector& Vector<T>::operator=(const Vector& other)
+template<typename T>
+Vector<T>& Vector<T>::operator=(const Vector<T>& other)
 {
 	size = other.size;
 	delete[] p;
@@ -84,7 +83,7 @@ Vector& Vector<T>::operator=(const Vector& other)
 }
 
 template<typename T>
-void Vector<T>::merge(const Vector* v1, const Vector* v2)
+void Vector<T>::merge(const Vector<T>* v1, const Vector<T>* v2)
 {
 	size = v1->size + v2 ->size;
 	delete[] p;
@@ -106,7 +105,7 @@ void Vector<T>::merge(const Vector* v1, const Vector* v2)
 }
 
 template<typename T>
-Vector Vector<T>::operator+=(const Vector& other)
+Vector<T> Vector<T>::operator+=(const Vector<T>& other)
 {
 	Vector<T> tmp;
 	tmp.merge(this, &other);
@@ -114,7 +113,7 @@ Vector Vector<T>::operator+=(const Vector& other)
 }
 
 template<typename T>
-Vector Vector<T>::operator+(const Vector& other)
+Vector<T> Vector<T>::operator+(const Vector<T>& other)
 {
 	Vector<T> tmp;
 	tmp.merge(this, &other);
