@@ -1,8 +1,10 @@
 #include<stdexcept>
 #include<iostream>
+#include "Vector.hpp"
+using namespace std;
 
 template<typename T>
-Vector<T>::Vector(Vector<T>& other)
+Vector<T>::Vector(Vector& other)
 {
 	size = other.size;
 	p = new T[size];
