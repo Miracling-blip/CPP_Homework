@@ -14,9 +14,10 @@ public:
 	friend T;
 	void pushback(T n);
 	void show();
+	void mergeSelf(const Vector&);
 	void merge(const Vector*,const Vector*);
 	Vector& operator=(const Vector&);
-	Vector operator+=(const Vector&);
+	Vector& operator+=(const Vector&);
 	T& operator[](int);
 	Vector operator+(const Vector&);
 private:
@@ -128,11 +129,19 @@ void Vector<T>::merge(const Vector<T>* v1, const Vector<T>* v2)
 }
 
 template<typename T>
-Vector<T> Vector<T>::operator+=(const Vector<T>& other)
+void Vector<T>::mergeSelf(const Vector<T>& other)
 {
-	Vector<T> tmp;
-	tmp.merge(this, &other);
-	return tmp;
+        for (int i = 0; i < other.size; i++)
+        {
+                this->pushback(other.p[i]);
+        }
+}
+
+template<typename T>
+Vector<T>& Vector<T>::operator+=(const Vector<T>& other)
+{
+	this->mergeSelf(other);
+	return *this;
 }
 
 template<typename T>
