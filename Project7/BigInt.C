@@ -3,7 +3,7 @@
 #include<cstring>
 using namespace std;
 
-BigInt::BigInt(size_t Number)
+BigInt::BigInt(int Number)
 {
 	if (Number == 0)
 	{
@@ -12,9 +12,19 @@ BigInt::BigInt(size_t Number)
 		s = new char[2];
 		s[0] = '0';
 		s[1] = '\0';
+		isMinus = false;
 	}
 	else
 	{
+		if(Number < 0)
+		{
+			isMinus = true;
+		}
+		else
+		{
+			isMinus = false;
+			Number = 0-Number;
+		}
 		isZero = false;
 		size_t n = Number, digit;
 		size = 0;
@@ -37,6 +47,7 @@ BigInt::BigInt(size_t Number)
 
 BigInt::BigInt()
 {
+	isMinus = false;
 	size = 0;
 	s = new char[0];
 	isZero = true;
@@ -44,16 +55,44 @@ BigInt::BigInt()
 
 BigInt::BigInt(const char* other)
 {
-	size = strlen(other);
-	s = new char[size + 1];
-	strcpy(s, other);
-	if (size == 1 && s[0] == '0')
+	if(other[0] == 45)
+	{
+		isMinus = true;
+		isZero = false;
+		size = strlen(other) - 1;
+		s = new char[size + 1];
+		int j = 1;
+		for (int i = 0; i < size; i++)
+		{
+			s[i] = other[j];
+			j++;
+		}
+		s[size] = '\0';
+	}
+	else if(other[0] == 48)
 	{
 		isZero = true;
+		isMinus = false;
+		size = 1;
+		s = new char[size + 1];
+		s[0] = '0';
+		s[1] = '\0';
 	}
 	else
 	{
-		isZero = false;
+		isMinus = false;
+		size = strlen(other);
+		s = new char[size + 1];
+		s[size] = '\0';
+		strcpy(s, other);
+		if (size == 1 && s[0] == '0')
+		{
+			isZero = true;
+		}
+		else
+		{
+			isZero = false;
+		}
 	}
 }
 
@@ -66,6 +105,7 @@ BigInt::BigInt(const BigInt& other)
 {
 	size = other.size;
 	isZero = other.isZero;
+	isMinus = other.isMinus;
 	s = new char[size + 1];
 	for (int i = 0; i < size; i++)
 	{
@@ -81,6 +121,8 @@ BigInt& BigInt::operator=(const BigInt& other)
 		return *this;
 	}
 	size = other.size;
+	isMinus = other.isMinus;
+	isZero = other.isZero;
 	delete[] s;
 	s = new char[size + 1];
         for (int i = 0; i < size; i++)
@@ -91,22 +133,54 @@ BigInt& BigInt::operator=(const BigInt& other)
 	return *this;
 }
 
-int BigInt::operator==(const BigInt& other)
+int BigInt::compare(const BigInt& a, const BigInt& b)
 {
-	bool isDif = cmp(&other, this);
-	if(isDif)
+	if(a.isMinus == true && b.isMinus ==false)
 	{
-		return 0;
+		return -1;
+	}
+	else if(a.isMinus == false && b.isMinus == true)
+	{
+		return 1;
+	}
+	else if(a.isMinus == true && b.isMinus ==true)
+	{
+		int cmp = cmpAbsolute(&a, &b);
+		if(cmp > 0)
+		{
+			return -1;
+		}
+		else if(cmp == 0)
+		{
+			return 0;
+		}
+		else
+		{
+			return 1;
+		}
 	}
 	else
 	{
+		return cmpAbsolute(&a, &b);
+	}
+}
+
+int BigInt::operator==(const BigInt& other)
+{
+	bool isDif = compare(other, *this);
+	if(isDif == 0)
+	{
 		return 1;
+	}
+	else
+	{
+		return 0;
 	}
 }
 
 int BigInt::operator>=(const BigInt& other)
 {
-	int judge = cmp(this, &other);
+	int judge = compare(*this, other);
 	if (judge == -1)
 	{
 		return 0;
@@ -119,7 +193,7 @@ int BigInt::operator>=(const BigInt& other)
 
 int BigInt::operator<=(const BigInt& other)
 {
-        int judge = cmp(this, &other);
+        int judge = compare(*this, other);
         if (judge == 1)
         {
                 return 0;
@@ -132,7 +206,7 @@ int BigInt::operator<=(const BigInt& other)
 
 int BigInt::operator>(const BigInt& other)
 {
-	int judge = cmp(this, &other);
+	int judge = compare(*this, other);
 	if (judge == 1)
 	{
 		return 1;
@@ -145,7 +219,7 @@ int BigInt::operator>(const BigInt& other)
 
 int BigInt::operator<(const BigInt& other)
 {
-        int judge = cmp(this, &other);
+        int judge = compare(*this, other);
         if (judge == -1)
         {
                 return 1;
@@ -158,7 +232,7 @@ int BigInt::operator<(const BigInt& other)
 
 int BigInt::operator!=(const BigInt& other)
 {
-        int judge = cmp(this, &other);
+        int judge = compare(*this, other);
         if (judge == 0)
         {
                 return 0;
@@ -171,6 +245,10 @@ int BigInt::operator!=(const BigInt& other)
 
 ostream& operator<<(ostream& os,const BigInt& other)
 {
+	if(other.isMinus == true)
+	{
+		os << '-';
+	}
 	for (int i = 0; i < other.size; i++)
 	{
 		os << other.s[i];
@@ -178,7 +256,7 @@ ostream& operator<<(ostream& os,const BigInt& other)
 	return os;
 }
 
-int BigInt::cmp(const BigInt* b1,const BigInt* b2)
+int BigInt::cmpAbsolute(const BigInt* b1,const BigInt* b2)
 {
 	if ( b1->size != b2->size)
 	{
@@ -221,73 +299,19 @@ BigInt& BigInt::operator+=(const BigInt& other)
 
 BigInt BigInt::operator+(const BigInt& other)
 {
-	const BigInt* pb;
-	const BigInt* ps;
 	BigInt tmp;
-	if(this->size >= other.size)
+	if(this->isMinus != other.isMinus)
 	{
-		pb = this;
-		ps = &other;
+		tmp = pureSub(*this, other);
+		if(isMinus == true && tmp.isZero == false)
+		{
+			tmp.isMinus = !tmp.isMinus;
+		}
+		return tmp;
 	}
 	else
 	{
-		pb = &other;
-		ps = this;
-	}
-	int sum[pb->size + 1], carry = 0;
-	bool isBigger = false;
-	int j = pb->size - 1, k = 0;
-	for (int i = ps->size - 1; i >= 0; i--)
-	{
-		sum[k] = pb->s[j] + ps->s[i] - 96 + carry;
-		if(sum[k] >= 10)
-		{
-			carry = 1;
-			sum[k] -= 10;
-		}
-		else
-		{
-			carry = 0;
-		}
-		if(sum[k] < 0 || sum[k] >= 10)
-		{
-			cout <<"WRONG!" <<endl;
-		}
-		k++;
-		j--;
-	}
-	for (int i = pb->size - ps->size - 1; i >= 0; i--)
-	{
-		sum[k] = pb->s[i] - '0' + carry;
-		if(sum[k] >= 10)
-		{
-			carry = 1;
-			sum[k] -= 10;
-		}
-		else
-		{
-			carry = 0;
-		}
-		k++;
-	}
-	if(carry == 1)
-	{
-		sum[pb->size] = 1;
-		delete[] tmp.s;
-		tmp.s = new char[pb->size + 1];
-		tmp.size = pb->size + 1;
-	}
-	else
-	{
-		delete[] tmp.s;
-		tmp.s = new char[pb->size];
-		tmp.size = pb -> size;
-	}
-	j = 0;
-	for (int i = tmp.size - 1; i >= 0; i--)
-	{
-		tmp.s[j] = sum[i] + '0';
-		j++;
+		tmp = pureSum(*this, other);
 	}
 	return tmp;
 }
@@ -331,6 +355,7 @@ BigInt BigInt::operator*(const BigInt& other)
         int t = 0; //t用于计量用到了第几个tmp
         for (int i = ps->size - 1; i >= 0; i--)  //循环较小的那个数，每次拿出一位与大的那个数乘起来
         {
+        	tmp[i].isMinus = false;
         	int len = pb->size + 1 + t; //len表示某一位相乘之后实际的长度
         	int sum[len], carry = 0;
         	bool isBigger = false;
@@ -387,6 +412,14 @@ BigInt BigInt::operator*(const BigInt& other)
         	finalSum.whetherZero();
         }
         delete[] tmp;
+        if(pb->isMinus == ps->isMinus)
+        {
+        	finalSum.isMinus = false;
+        }
+        else
+        {
+        	finalSum.isMinus = true;
+        }
         return finalSum;
 }
 
@@ -402,3 +435,251 @@ void BigInt::whetherZero()
 	}
 	isZero = true;
 }
+
+BigInt BigInt::pureSum(const BigInt& a, const BigInt& b)
+{
+	BigInt tmp;
+	const BigInt* pb;
+	const BigInt* ps;
+	int judge = cmpAbsolute(&a, &b);
+	if(judge > 0)
+	{
+		pb = &a;
+		ps = &b;
+	}
+	else
+	{
+		pb = &b;
+		ps = &a;
+	}
+	int sum[pb->size + 1], carry = 0;
+	bool isBigger = false;
+	int j = pb->size - 1, k = 0;
+	for (int i = ps->size - 1; i >= 0; i--)
+	{
+		sum[k] = pb->s[j] + ps->s[i] - 96 + carry;
+		if(sum[k] >= 10)
+		{
+			carry = 1;
+			sum[k] -= 10;
+		}
+		else
+		{
+			carry = 0;
+		}
+		if(sum[k] < 0 || sum[k] >= 10)
+		{
+			cout <<"WRONG!" <<endl;
+		}
+		k++;
+		j--;
+	}
+	for (int i = pb->size - ps->size - 1; i >= 0; i--)
+	{
+		sum[k] = pb->s[i] - '0' + carry;
+		if(sum[k] >= 10)
+		{
+			carry = 1;
+			sum[k] -= 10;
+		}
+		else
+		{
+			carry = 0;
+		}
+		k++;
+	}
+	if(carry == 1)
+	{
+		sum[pb->size] = 1;
+		delete[] tmp.s;
+		tmp.s = new char[pb->size + 1];
+		tmp.size = pb->size + 1;
+	}
+	else
+	{
+		delete[] tmp.s;
+		tmp.s = new char[pb->size];
+		tmp.size = pb -> size;
+	}
+	j = 0;
+	for (int i = tmp.size - 1; i >= 0; i--)
+	{
+		tmp.s[j] = sum[i] + '0';
+		j++;
+	}
+	tmp.isMinus = false;
+	return tmp;
+}
+
+BigInt BigInt::pureSub(const BigInt& a, const BigInt& b)
+{
+	const BigInt* pb;
+	const BigInt* ps;
+	BigInt result;
+	int judge = cmpAbsolute(&a, &b);
+	if(judge > 0)
+	{
+		result.isMinus = false;
+		result.isZero = false;
+		pb = &a;
+		ps = &b;
+	}
+	else if(judge == 0)
+	{
+		result.isZero = true;
+		result.isMinus = false;
+		delete[] result.s;
+		result.size = 1;
+		result.s = new char[2];
+		result.s[0] = '0';
+		result.s[1] = '\0';
+		return result;
+	}
+	else
+	{
+		result.isZero = false;
+		result.isMinus = true;
+		pb = &b;
+		ps = &a;
+	}
+	int carry = 0, k = 0, tmp_i = pb->size - 1;
+	delete[] result.s;
+	result.s = new char[pb->size + 1];
+	for (int i = ps->size - 1; i >= 0; i--)
+	{
+		if(pb->s[tmp_i] > ps->s[i])
+		{
+			result.s[k] = pb->s[tmp_i] - ps->s[i] + carry + '0';
+		}
+		else if(pb->s[tmp_i] == ps->s[i])
+		{
+			if(carry == 0)
+			{
+				result.s[k] = '0';
+			}
+			else
+			{
+				carry = -1;
+				result.s[k] = pb->s[tmp_i] - ps->s[i] + 10 + carry + '0';
+			}
+		}
+		else
+		{
+			result.s[k] = pb->s[tmp_i] - ps->s[i] + 10 + carry + '0';
+			carry = -1;
+		}
+		k++;
+		tmp_i--;
+	}
+	if(tmp_i != pb->size - ps->size - 1)
+	{
+		cout << "WRONG IN PURE" <<endl;
+	}
+	for (int i = pb->size - ps->size - 1; i >= 0; i--)
+	{
+		if(pb->s[i] == '0' && carry == -1)
+		{
+			result.s[k] = '9';
+		}
+		else
+		{
+			result.s[k] = pb->s[i] + carry;
+		}
+		k++;
+		if(k >= pb->size + 1)
+		{
+			cout << "WRONG IN PURESUB"<<endl;
+		}
+	}
+	BigInt finalSub;
+	result.s[k] = '\0';
+	result.size = k;
+	delete[] finalSub.s;
+	finalSub.s = new char[k + 1];
+	int j = 0;
+	for (int i = k-1; i >= 0; i--)
+	{
+		finalSub.s[j] = result.s[i];
+		j++;
+	}
+	finalSub.size = result.size;
+	finalSub.isMinus = result.isMinus;
+	finalSub.isZero = result.isZero;
+	finalSub.s[j] = '\0';
+	finalSub.removeZero();
+	return finalSub;
+}
+
+void BigInt::removeZero()
+{
+	if(s[0] == '0')
+	{
+		if(isZero == true)
+		{
+			size = 1;
+			isMinus = false;
+			delete[] s;
+			s = new char[2];
+			s[0] = '0';
+			s[1] = '\0';
+			return;
+		}
+		BigInt* tmp;
+		tmp = new BigInt(0);
+		int i = 0;
+		while(s[i] == '0')
+		{
+			i++;
+		}
+		delete[] tmp->s;
+		int tmp_size = size - i;
+		tmp->s = new char[tmp_size + 1];
+		int k = 0;
+		for (int j = i; j <= size-1; j++)
+		{
+			tmp->s[k] = s[j];
+			k++;
+		}
+		tmp->size = tmp_size;
+		tmp->isZero = false;
+		tmp->isMinus = isMinus;
+		tmp->s[tmp_size] = '\0';
+		*this = *tmp;
+		delete tmp;
+	}
+	else
+	{
+		return;
+	}
+}
+
+BigInt& BigInt::operator-=(const BigInt& other)
+{
+	*this = *this - other;
+	return *this;
+}
+
+BigInt BigInt::operator-(const BigInt& other)
+{
+	BigInt tmp;
+	if(isMinus == false && other.isMinus == true)
+	{
+		tmp = pureSum(*this, other);
+		tmp.isMinus = false;
+	}
+	else if(isMinus == true && other.isMinus == false)
+	{
+		tmp = pureSum(*this, other);
+		tmp.isMinus = true;
+	}
+	else if(isMinus == false && other.isMinus == false)
+	{
+		tmp = pureSub(*this, other);
+	}
+	else
+	{
+		tmp = pureSub(other, *this);
+	}
+	return tmp;
+}
+
