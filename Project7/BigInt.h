@@ -5,7 +5,7 @@ using namespace std;
 class BigInt
 {
 public:
-	BigInt(int Number);
+	BigInt(size_t Number);
 	BigInt(const char* other);
 	BigInt(const BigInt& other);
 	BigInt();
@@ -21,20 +21,11 @@ public:
 	BigInt operator+(const BigInt&);
 	BigInt& operator*=(const BigInt&);
 	BigInt operator*(const BigInt&);
-	BigInt operator-(const BigInt&);
-	BigInt& operator-=(const BigInt&);
-	/*BigInt operator/(const BigInt&);
-	BigInt& operator/=(const BigInt&);*/
 	friend ostream& operator<<(ostream&, const BigInt&);
-	BigInt pureSub(const BigInt& a,const BigInt& b);
-	BigInt pureSum(const BigInt&, const BigInt&);
-	//pure函数的含义：不管正负号，将两个数进行加减
-	int cmpAbsolute(const BigInt*,const BigInt*);
-	int compare(const BigInt&, const BigInt&);
-	void removeZero();
+	int cmp(const BigInt*,const BigInt*);
 	void whetherZero();
 private:
-	bool isZero, isMinus;
+	bool isZero;
 	size_t len, size;
 	char* s;
 };
